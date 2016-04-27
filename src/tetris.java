@@ -1,10 +1,10 @@
-//Implement singleton and factory pattern
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Tetris.java - The Tetris class handles the main game loop, GUI creation, and
@@ -224,6 +224,18 @@ public class Tetris extends JFrame implements ActionListener, KeyListener {
     private int lines;
 
     /**
+     * Value is true if user paused the game and false otherwise
+     * 
+     */
+    private boolean isPaused; 
+    
+    /*
+     * Timer that will keep time during the game
+     * 
+     */
+    Timer timeClock;
+    
+    /**
      * Stores the piece that is upcoming to be displayed.
      * @type String
      */
@@ -343,7 +355,8 @@ public class Tetris extends JFrame implements ActionListener, KeyListener {
                 count++;
             }
         }
-
+        
+        timeClock = new Timer();
         frame.add(c, BorderLayout.SOUTH);
         frame.setVisible(true);
 
@@ -844,6 +857,7 @@ public class Tetris extends JFrame implements ActionListener, KeyListener {
             if(gameRunning == 0) {
                 gameLoop = new GameThread();
                 gameLoop.start();
+                new Reminder(1);
 
                 //Change button text
                 startGame.setText("New game");
@@ -869,6 +883,7 @@ public class Tetris extends JFrame implements ActionListener, KeyListener {
 
         //Determine which menu item was pressed
         if (item == menuReset) {
+          time = -1;
         } else if (item == exit) {
             System.exit(0);
         } else if (item == about) {
@@ -918,6 +933,10 @@ public class Tetris extends JFrame implements ActionListener, KeyListener {
                 case KeyEvent.VK_SPACE:
                     slamDown();
                     break;
+                case KeyEvent.VK_P:
+                  isPaused = !isPaused;
+                  return;
+             
             }
     }
     //End of keyPressed method
@@ -931,5 +950,33 @@ public class Tetris extends JFrame implements ActionListener, KeyListener {
 
     }
     //End of keyReleased method
-}
-//End of Tetris class
+    
+    
+    
+    //
+// class for keeping track of the time elapsed
+//
+public class Reminder 
+{
+
+  public Reminder(int seconds) 
+  {
+    if(!isPaused)
+          timeClock.schedule(new RemindTask(),0, 1*1000);
+  }
+
+    class RemindTask extends TimerTask 
+    {
+        public void run() 
+        { 
+           if(!isPaused)
+              time++;
+              timer.setText("     Time: \n" + time);
+            
+        }
+       
+    }
+ }// end of Reminder class
+
+
+}//End of Tetris class
